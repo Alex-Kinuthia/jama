@@ -658,7 +658,7 @@ break;
 					 break;
 
 
-	      case 3:
+	      case 2:
 					 //11d. Update city
 						 $sql11d = "UPDATE microfinance SET `city`='".$userResponse."' WHERE `phonenumber` = '". $phoneNumber ."'";
 						 $db->query($sql11d);
