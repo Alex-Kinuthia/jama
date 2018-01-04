@@ -67,6 +67,8 @@ if(!empty($_POST) && !empty($_POST['phoneNumber'])){
                $response .= " 3. Check Account \n";
 
 
+
+
 						 // Print the response onto the page so that our gateway can read it
 						 header('Content-type: text/plain');
 						 echo $response;
@@ -94,6 +96,7 @@ if(!empty($_POST) && !empty($_POST['phoneNumber'])){
              $response = "CON Agent.?\n";
              $response .= " 1. Animal Market.\n";
              $response .= " 2. Market.\n";
+             $response .= " 3. Check car payment status.\n";
 	 //Update sessions to level 12
 						 $sqlLvl12="UPDATE `session_levels` SET `level`=12 where `session_id`='".$sessionId."'";
 						 $db->query($sqlLvl12);
@@ -102,22 +105,8 @@ if(!empty($_POST) && !empty($_POST['phoneNumber'])){
 						 echo $response;
 					 }
 						break;
-            case "9*1":
-              if($level==1){
-                //9e. Ask how much and Launch the Mpesa Checkout to the user
-              $response = "CON Proceed with parking payment.?\n";
-              $response .= " 1. Town 150/.\n";
-              $response .= " 2. Province 100/.\n";
-              $response .= " 3. Iftin 100/.\n";
-              $response = "4. Check car payment status.\n";
-   //Update sessions to level 12
-                $sqlLvl12="UPDATE `session_levels` SET `level`=6 where `session_id`='".$sessionId."'";
-                $db->query($sqlLvl12);
-                // Print the response onto the page so that our gateway can read it
-                header('Content-type: text/plain');
-                echo $response;
-              }
-							break;
+
+
 							case "1*2":
 								if($level==1){
 									//9e. Ask how much and Launch the Mpesa Checkout to the user
@@ -302,27 +291,19 @@ if(!empty($_POST) && !empty($_POST['phoneNumber'])){
 								 switch ($userResponse) {
 										 case "1":
 											 //End session
-                       $response = "CON Proceed with parking payment.?\n";
-                       $response .= " 1. Town 150/.\n";
+                       case "4":
+                         //End session
 
+                                    $response = "CON Please enter your car plate number";
+                                    $sql12b = "UPDATE microfinance SET `plate_no`='".$userResponse."' WHERE `phonenumber` LIKE '%". $phoneNumber ."%'";
+                                              $db->query($sql12b);
+                                              //11c. We graduate the user to the city level
+                                    $sqlLvl12="UPDATE `session_levels` SET `level`=20 where `session_id`='".$sessionId."'";
+                                    $db->query($sqlLvl12);
+                         // Print the response onto the page so that our gateway can read it
+                         header('Content-type: text/plain');
+                         echo $response;
 
-                       $response .= " 2. Province 100/.\n";
-                      //  $sqlLvl17="UPDATE `session_levels` SET `level`=17 where `session_id`='".$sessionId."'";
-                      //  $db->query($sqlLvl17);
-
-                       $response .= " 3. Iftin 100/.\n";
-                      //  $sqlLvl18="UPDATE `session_levels` SET `level`=18 where `session_id`='".$sessionId."'";
-                      //  $db->query($sqlLvl18);
-
-                       $response .= " 4. Check car payment status.\n";
-                      //  $sqlLvl19="UPDATE `session_levels` SET `level`=19 where `session_id`='".$sessionId."'";
-                      //  $db->query($sqlLvl19);
-											 // Print the response onto the page so that our gateway can read it
-                       // Print the response onto the page so that our gateway can read it
-                       header('Content-type: text/plain');
-                       $sqlLvl16="UPDATE `session_levels` SET `level`=16 where `session_id`='".$sessionId."'";
-                       $db->query($sqlLvl16);
-                       echo $response;
 											 break;
 
                        case "2":
@@ -370,6 +351,17 @@ if(!empty($_POST) && !empty($_POST['phoneNumber'])){
                                  header('Content-type: text/plain');
                                  echo $response;
                                 break;
+
+                                case "3":
+                                  //End session
+                                   $response = "CON Please enter your car plate number";
+
+                                   $sqlLvl12="UPDATE `session_levels` SET `level`=22 where `session_id`='".$sessionId."'";
+                                   $db->query($sqlLvl12);
+                        // Print the response onto the page so that our gateway can read it
+                        header('Content-type: text/plain');
+                        echo $response;
+                                  break;
 
                               }
                               break;
@@ -431,19 +423,46 @@ if(!empty($_POST) && !empty($_POST['phoneNumber'])){
                 case "4":
                   //End session
 
-                        $response = "END You are paying 100/. Please do send 100/ to 0742588200\n";
+                             $response = "CON Please enter your car plate number";
+
+                             $sqlLvl12="UPDATE `session_levels` SET `level`=21 where `session_id`='".$sessionId."'";
+                             $db->query($sqlLvl12);
                   // Print the response onto the page so that our gateway can read it
                   header('Content-type: text/plain');
                   echo $response;
 
-                  $parking=100;
-                //Create pending record in checkout to be cleared by cronjobs
-    $sql11b = "UPDATE microfinance SET `parking`='".$parking."' WHERE `phonenumber` LIKE '%". $phoneNumber ."%'";
-                $db->query($sql11b);
+
            break;
+ }
 
+ break;
 
-										 }
+ case 20;
+ $response = "CON Proceed with parking payment.?\n";
+                    $response .= " 1. Town 150/.\n";
+
+                    $response .= " 2. Province 100/.\n";
+                     //  $sqlLvl17="UPDATE `session_levels` SET `level`=17 where `session_id`='".$sessionId."'";
+                     //  $db->query($sqlLvl17);
+                      $response .= " 3. Iftin 100/.\n";
+                     //  $sqlLvl18="UPDATE `session_levels` SET `level`=18 where `session_id`='".$sessionId."'";
+                     //  $db->query($sqlLvl18);
+                      header('Content-type: text/plain');
+                      $sqlLvl16="UPDATE `session_levels` SET `level`=16 where `session_id`='".$sessionId."'";
+                      $db->query($sqlLvl16);
+                      echo $response;
+break;
+
+                   case 21;
+                      $response = "END The car  has already paid\n";
+                      header('Content-type: text/plain');
+                      echo $response;
+break;
+
+case 22;
+   $response = "END The car  has already paid\n";
+   header('Content-type: text/plain');
+   echo $response;
 break;
                      case 17:
                        //12. Pay loan
@@ -553,6 +572,8 @@ break;
 																	 break;
 														 }
 																 break;
+
+
 				 default:
 					 //11g. Request for city again
 		 }
@@ -636,20 +657,6 @@ break;
 						 echo $response;
 					 break;
 
-
-           case 2:
-             //11b. Update Name, Request for city
-               $sql12b = "UPDATE microfinance SET `plate_no`='".$userResponse."' WHERE `phonenumber` LIKE '%". $phoneNumber ."%'";
-               $db->query($sql12b);
-               //11c. We graduate the user to the city level
-               $sql12c = "UPDATE `session_levels` SET `level`=3 WHERE `session_id`='".$sessionId."'";
-               $db->query($sql12c);
-   //We request for the city
-               $response = "CON Please enter your Car Plates No";
-             // Print the response onto the page so that our gateway can read it
-             header('Content-type: text/plain');
-               echo $response;
-             break;
 
 	      case 3:
 					 //11d. Update city
